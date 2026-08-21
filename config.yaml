@@ -117,7 +117,10 @@ research:
 # hard validation pass afterwards. Loosen these and the layout will overflow.
 budgets:
   forex_paragraphs:      { count: 3,     words_each: 40 }
-  international_bullets: { count: 7,     words_each: 26 }
+  # The left column carries all seven of these alone, so it is the half that
+  # overflows. Observed natural-spacing heights at 26 words ran 731-805pt
+  # against a 762pt limit — i.e. it fit most days and failed on a long one.
+  international_bullets: { count: 7,     words_each: 21 }
   local_bullets:         { count: 2,     words_each: 30 }
   on_this_day_bullets:   { count: 2,     words_each: 22 }
   # Characters, not words, and counted across the quote AND the author — they
