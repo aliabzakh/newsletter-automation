@@ -1,0 +1,100 @@
+name: Daily newsletter
+
+on:
+  schedule:
+    # 06:30 UTC = 09:30 in Amman (UTC+3 year-round — Jordan dropped DST in 2022).
+    # Day field 0-4 is Sunday through Thursday: Jordan's working week.
+    #
+    # GitHub's scheduler is best-effort and can lag by several minutes under
+    # load. If the exact minute ever matters, move the send behind your own
+    # scheduler — this is a briefing, so a few minutes' drift is fine.
+    - cron: "30 6 * * 0-4"
+
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build the PDF but don't email it"
+        type: boolean
+        default: false
+      force:
+        description: "Run even on a non-publishing weekday"
+        type: boolean
+        default: true
+
+concurrency:
+  group: daily-newsletter
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # to commit the archived PDF back
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install Chromium
+        # --with-deps pulls the system libraries Chromium needs; skip it when the
+        # browser itself was cached but keep it cheap either way.
+        run: playwright install --with-deps chromium
+
+      - name: Restore Seravek fonts
+        # Three secrets, one per weight: a single combined blob is ~833 KB and
+        # GitHub caps a secret at 48 KB.
+        env:
+          SERAVEK_LIGHT_B64: ${{ secrets.SERAVEK_LIGHT_B64 }}
+          SERAVEK_REGULAR_B64: ${{ secrets.SERAVEK_REGULAR_B64 }}
+          SERAVEK_BOLD_B64: ${{ secrets.SERAVEK_BOLD_B64 }}
+        run: python scripts/unpack_fonts.py
+
+      - name: Build and send
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENTS: ${{ secrets.RECIPIENTS }}   # optional; overrides recipients.yaml
+        run: |
+          python src/main.py \
+            ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }} \
+            ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
+
+      - name: Upload the issue as a build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsletter-${{ github.run_id }}
+          path: out/*.pdf
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Commit the archived issue
+        if: success()
+        run: |
+          if [ -z "$(git status --porcelain archive/)" ]; then
+            echo "nothing new to archive"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive/
+          git commit -m "Archive newsletter for $(date -u +%Y-%m-%d)"
+          # The scheduled job is the only writer, but a manual run could race it.
+          git pull --rebase --autostash
+          git push

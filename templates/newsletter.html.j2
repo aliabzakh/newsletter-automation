@@ -1,0 +1,267 @@
+{#-
+  News in 60 Seconds — page template.
+
+  Geometry is in points on a 612 x 792pt page, measured off the original PDF.
+  Fixed furniture (masthead, pill tables, disclaimer) is absolutely positioned;
+  the two text columns are absolutely positioned *containers* whose contents
+  flow, so a slightly longer bullet pushes the panel below it down instead of
+  overlapping it. render.py measures the result and retries if it overruns.
+
+  `tighten` is the knob the fit-check turns: 0 is the original spacing, and each
+  step shaves leading and paragraph gaps before anything gets truncated.
+-#}
+{% set L = layout %}
+{% set P = L.palette %}
+{% set T = L.type %}
+{#- Line steps measured off the original PDF: 13.56pt on 11.28pt body text and
+    14.64pt on the 12.24pt left-column bullets, i.e. leading of almost exactly
+    1.20 in both. Paragraphs are separated by one full blank line; bullets get no
+    extra gap at all. `tighten` shaves these down a fraction of a point at a time. -#}
+{% set step_body   = 13.56 - tighten * 0.34 %}
+{% set step_bullet = 14.64 - tighten * 0.37 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>News in 60 Seconds — {{ date_long }}</title>
+<style>
+  {% for face in fonts %}
+  @font-face {
+    font-family: "Seravek";
+    font-weight: {{ face.weight }};
+    font-style: normal;
+    src: url("data:{{ face.mime }};base64,{{ face.b64 }}") format("{{ face.format }}");
+  }
+  {% endfor %}
+
+  @page { size: {{ L.page.width }}pt {{ L.page.height }}pt; margin: 0; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: {{ L.page.width }}pt;
+    height: {{ L.page.height }}pt;
+    font-family: "Seravek", "Segoe UI", sans-serif;
+    color: {{ P.body }};
+    background: #fff;
+    -webkit-hyphens: none; hyphens: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  #page { position: relative; width: {{ L.page.width }}pt; height: {{ L.page.height }}pt; overflow: hidden; }
+
+  .abs { position: absolute; }
+
+  /* ---- masthead ------------------------------------------------------ */
+  #date {
+    right: 46pt; top: 12pt;
+    font-size: {{ T.quote }}pt; font-weight: 400; text-align: right;
+  }
+  /* Mirrors #date across the page: same baseline, same type, opposite edge. */
+  #edition {
+    left: 46pt; top: 12pt;
+    font-size: {{ T.quote }}pt; font-weight: 400; text-align: left;
+  }
+  #logo { left: 406.5pt; top: 42pt; width: 148pt; }
+  #logo img { display: block; width: 100%; }
+
+  #masthead { left: 45.5pt; top: 28pt; width: 290pt; text-align: center; }
+  #title {
+    font-size: {{ T.title }}pt; font-weight: 300; line-height: 1.0;
+    white-space: nowrap; letter-spacing: -0.1pt;
+  }
+  #title b { font-weight: 700; }
+  #quote {
+    margin-top: {{ 7 - tighten }}pt;
+    font-size: {{ T.quote }}pt; font-weight: 400; line-height: 1.22;
+  }
+  #quote .who { font-weight: 700; }
+
+  /* ---- pill tables --------------------------------------------------- */
+  .pill-col { position: absolute; top: {{ L.pills.header_y }}pt; }
+  #col-currency  { left: {{ L.pills.currency.x }}pt;  width: {{ L.pills.currency.width }}pt; }
+  #col-commodity { left: {{ L.pills.commodity.x }}pt; width: {{ L.pills.commodity.width }}pt; }
+
+  .pill-header {
+    height: {{ L.pills.header_height }}pt;
+    border-radius: {{ L.pills.radius }}pt;
+    background: {{ P.navy }};
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: {{ T.heading }}pt; line-height: 1;
+  }
+  .pill-header .unit { font-size: {{ T.pill_unit }}pt; font-weight: 700; margin-left: 3pt; }
+
+  .pill {
+    position: absolute; left: 0; right: 0;
+    height: {{ L.pills.row_height }}pt;
+    border-radius: {{ L.pills.radius }}pt;
+    display: flex; align-items: center;
+    color: #fff; font-size: {{ T.pill }}pt; font-weight: 400; line-height: 1;
+  }
+  .pill .arrow { width: 34pt; flex: 0 0 34pt; display: flex; align-items: center; justify-content: center; }
+  .pill .arrow svg { display: block; width: 27pt; height: 19pt; }
+  .pill .label { flex: 1; text-align: center; padding-right: 6pt; white-space: nowrap; }
+
+  .pill.up   { background: {{ P.up_fill }}; }
+  .pill.down { background: {{ P.down_fill }}; }
+  .pill.flat { background: {{ P.flat_fill }}; }
+
+  /* ---- recorded-as-of block ------------------------------------------ */
+  #recorded { left: 183.6pt; top: 297pt; width: 132pt; }
+  #recorded .lead { font-size: {{ T.body }}pt; font-weight: 700; line-height: 1.26; }
+  #recorded .stamp { font-size: {{ T.body }}pt; font-weight: 400; line-height: 1.26; padding-left: 2.5pt; }
+  #recorded .note {
+    margin-top: {{ 10 - tighten }}pt;
+    font-size: {{ T.note }}pt; font-style: italic; font-weight: 400; line-height: 1.3;
+  }
+
+  /* ---- shared type --------------------------------------------------- */
+  h2 {
+    font-size: {{ T.heading }}pt; font-weight: 700; color: {{ P.navy }};
+    line-height: 1.0; letter-spacing: -0.05pt;
+  }
+
+  ul { list-style: none; }
+  li { position: relative; padding-left: 14pt; }
+  li::before {
+    content: "•"; position: absolute; left: 2pt; top: 0;
+    font-family: "Segoe UI", sans-serif;
+  }
+
+  /* ---- left column: international & regional -------------------------- */
+  #col-left { left: {{ L.columns.left.x }}pt; top: 386pt; width: {{ L.columns.left.width }}pt; }
+  #col-left ul { margin-top: {{ 5.5 - tighten * 0.4 }}pt; }
+  #col-left li {
+    font-size: {{ T.bullet_large }}pt;
+    line-height: {{ step_bullet }}pt;
+    text-align: justify;
+    padding-left: 28pt;          /* text lands at 73.5pt, matching the original */
+  }
+  #col-left li::before { left: 7pt; }
+
+  /* ---- right column: forex, local, on-this-day ------------------------ */
+  #col-right { left: {{ L.columns.right.x }}pt; top: 110pt; width: {{ L.columns.right.width }}pt; }
+
+  #forex p {
+    font-size: {{ T.body }}pt;
+    line-height: {{ step_body }}pt;
+    text-align: justify;
+    /* The original never hyphenates — it lets word spacing stretch instead. */
+    -webkit-hyphens: none; hyphens: none;
+  }
+  #forex h2 + p { margin-top: {{ 5 - tighten * 0.4 }}pt; }
+  #forex p + p  { margin-top: {{ step_body }}pt; }   /* exactly one blank line */
+
+  .panel-block { margin-top: {{ 13 - tighten * 1.1 }}pt; }
+  .panel-block h2 { margin-bottom: {{ 6 - tighten * 0.5 }}pt; }
+  .panel {
+    background: {{ P.navy }};
+    color: {{ P.panel_text }};
+    /* The original's corners: generous on top-left and bottom-right, tight on
+       the other two. It reads as a subtle forward lean. */
+    border-radius: 20pt 4pt 20pt 4pt;
+    padding: {{ 12 - tighten * 0.8 }}pt 13pt {{ 12 - tighten * 0.8 }}pt 14pt;
+  }
+  .panel li {
+    font-size: {{ T.body }}pt;
+    line-height: {{ step_body }}pt;
+    text-align: justify;
+    padding-left: 14pt;          /* text lands at 366.5pt, matching the original */
+  }
+  .panel li::before { left: 1pt; }
+  .panel li b { font-weight: 700; }
+
+  /* ---- disclaimer ----------------------------------------------------- */
+  #disclaimer {
+    left: 45.5pt; bottom: 10pt; width: 521pt;
+    text-align: center; font-size: {{ T.disclaimer }}pt;
+    font-style: italic; line-height: 1.25;
+  }
+  #disclaimer .star { font-weight: 700; font-style: italic; }
+</style>
+</head>
+<body>
+<div id="page">
+
+  <div class="abs" id="edition">{{ masthead.edition_prefix }}{{ edition }}</div>
+
+  <div class="abs" id="date">{{ date_long }}</div>
+
+  <div class="abs" id="logo">
+    <img src="data:image/png;base64,{{ logo_b64 }}" alt="Capital Bank"/>
+  </div>
+
+  <div class="abs" id="masthead">
+    <div id="title">{{ masthead.title_prefix }}<b>{{ masthead.title_number }}</b>{{ masthead.title_suffix }}</div>
+    <div id="quote">&ldquo;{{ content.quote.text }}&rdquo; <span class="who">{{ content.quote.author }}</span></div>
+  </div>
+
+  {#- Pill tables. Rows are absolutely placed on the original's pitch so the two
+      columns line up regardless of how many rows each one has. -#}
+  <div class="pill-col" id="col-currency">
+    <div class="pill-header">Currency<span class="unit">(BPS)</span></div>
+    {% for q in currencies %}
+    <div class="pill {{ q.direction }}"
+         style="top: {{ L.pills.first_row_y - L.pills.header_y + loop.index0 * L.pills.row_pitch }}pt;">
+      <span class="arrow">{{ arrow(q.direction) }}</span>
+      <span class="label">{{ q.display }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="pill-col" id="col-commodity">
+    <div class="pill-header">Commodity<span class="unit">(%)</span></div>
+    {% for q in commodities %}
+    <div class="pill {{ q.direction }}"
+         style="top: {{ L.pills.first_row_y - L.pills.header_y + loop.index0 * L.pills.row_pitch }}pt;">
+      <span class="arrow">{{ arrow(q.direction) }}</span>
+      <span class="label">{{ q.display }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="abs" id="recorded">
+    <div class="lead">Recorded as of:</div>
+    <div class="stamp">{{ date_long }}. {{ masthead.recorded_at }}</div>
+    <div class="note">{{ capture_note }}</div>
+  </div>
+
+  <div class="abs" id="col-left">
+    <h2>International and Regional News</h2>
+    <ul>
+      {% for item in content.international %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  <div class="abs" id="col-right">
+    <div id="forex">
+      <h2>Forex News</h2>
+      {% for para in content.forex %}<p>{{ para }}</p>{% endfor %}
+    </div>
+
+    <div class="panel-block">
+      <h2>Local News</h2>
+      <div class="panel"><ul>
+        {% for item in content.local %}<li>{{ item }}</li>{% endfor %}
+      </ul></div>
+    </div>
+
+    <div class="panel-block">
+      <h2>On This Day in Finance</h2>
+      <div class="panel"><ul>
+        {% for item in content.on_this_day %}<li><b>{{ item.year }}:</b> {{ item.text }}</li>{% endfor %}
+      </ul></div>
+    </div>
+  </div>
+
+  <div class="abs" id="disclaimer">
+    <span class="star">*Disclaimer*</span> {{ masthead.disclaimer }}
+  </div>
+
+</div>
+</body>
+</html>

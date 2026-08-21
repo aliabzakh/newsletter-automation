@@ -1,0 +1,28 @@
+# Seravek is a commercial font (Bitstream/Monotype, bundled with macOS).
+# Embedding it in a generated PDF is fine; redistributing the TTFs is not.
+# CI restores subsetted woff2 from the three SERAVEK_*_B64 secrets at build time.
+fonts/*.ttf
+fonts/*.otf
+fonts/*.woff2
+# pack_fonts.py output — the same fonts, just base64'd. Never commit these.
+*.b64.txt
+
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Build output
+out/
+*.pdf
+!archive/*.pdf
+
+# OS
+desktop.ini
+.DS_Store
+Thumbs.db

@@ -1,0 +1,19 @@
+# Who gets the newsletter.
+#
+# This file is committed, so only put addresses in here that you're happy to
+# have in a public repo. If you'd rather not, leave this list empty and set the
+# RECIPIENTS environment variable / GitHub secret to a comma-separated list
+# instead — main.py prefers that when it's present.
+#
+# A note on the branding: this document carries the Capital Bank of Jordan logo
+# and a disclaimer written in the bank's voice. It's a personal reconstruction
+# of an internship project, not an official bank publication. Keep this list to
+# people who know that.
+
+# Intentionally empty: this repo is public, so the real list lives in the
+# RECIPIENTS secret instead. Locally, set RECIPIENTS in .env to send to
+# yourself. Adding an address here publishes it.
+to: []
+
+cc: []
+bcc: []

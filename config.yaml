@@ -1,0 +1,178 @@
+# News in 60 Seconds — pipeline configuration.
+#
+# Everything the newsletter needs to know that isn't a secret lives here.
+# Secrets come from the environment: ANTHROPIC_API_KEY, GMAIL_ADDRESS,
+# GMAIL_APP_PASSWORD.
+
+masthead:
+  title_prefix: "News in "
+  title_number: "60"
+  title_suffix: " Seconds"
+  timezone: "Asia/Amman"          # Jordan is UTC+3 year-round (DST abolished 2022)
+  recorded_at: "9:30 AM"
+  logo: "assets/logo.png"
+
+  # The number on the first edition this ledger ever records. After that the
+  # count comes from archive/history.json, not from here.
+  edition_start: 1
+  edition_prefix: "No. "
+
+  # The italic line under "Recorded as of". Fixed wording, written once — only
+  # {session} changes from issue to issue. It sits in a 132pt column, so the
+  # whole line has to stay near 95 characters; past that it wraps into the
+  # market pills. This is why it isn't written fresh each morning.
+  capture_note: >-
+    All figures are indicative, captured around the close of the
+    {session} session.
+
+  disclaimer: >-
+    The above is not considered investment advice. The above information is
+    obtained from third-party views and does not represent the views of the
+    Capital Bank of Jordan or the National Bank of Iraq
+
+# ---------------------------------------------------------------------------
+# Market data
+# ---------------------------------------------------------------------------
+# `symbol` is the yfinance ticker. `invert: false` means the printed number is
+# the ticker's own quote. The six FX rows below reproduce the original exactly:
+# EUR/GBP/AUD are quoted XXX-per-USD, while CAD/CHF/JPY are quoted USD-per-XXX,
+# which is why USD/CAD rising is a green row.
+#
+# Change units:
+#   fx        -> relative basis points, (delta / previous) * 10_000, integer
+#   commodity -> relative percent,      (delta / previous) * 100,    2 decimals
+# Both are printed as absolute values; direction is carried by colour and arrow.
+
+# Each row lists `sources` in priority order. The first one that returns two
+# usable daily closes wins, and BOTH the printed price and the change are taken
+# from that same series so they always reconcile. `invert: true` prints 1/price,
+# which is how the CAD/CHF/JPY futures get flipped into USD-per-XXX.
+#
+# On the two FX source options — measured against the July 2025 issue:
+#
+#   =X spot tickers   closer to true spot (CHF within ~6 pips) BUT Yahoo returns
+#                     one snapshot per day with open == close, at a loose time of
+#                     day, so the day-over-day delta is only roughly a session.
+#   CME futures       real session OHLC and a genuine settlement-to-settlement
+#                     move; GBP/CAD/AUD landed within 0.04% of the original. The
+#                     cost is futures basis — CHF sits ~0.7% off spot.
+#
+# Default is spot, because a reader of an FX briefing expects spot rates and the
+# page is labelled "indicative". Swap the order below to prefer futures.
+
+currencies:
+  - label: "EUR"
+    decimals: 4
+    sources: [{ symbol: "EURUSD=X" }, { symbol: "6E=F" }]
+  - label: "GBP"
+    decimals: 4
+    sources: [{ symbol: "GBPUSD=X" }, { symbol: "6B=F" }]
+  - label: "CAD"
+    decimals: 4
+    sources: [{ symbol: "USDCAD=X" }, { symbol: "6C=F", invert: true }]
+  - label: "CHF"
+    decimals: 4
+    sources: [{ symbol: "USDCHF=X" }, { symbol: "6S=F", invert: true }]
+  - label: "AUD"
+    decimals: 4
+    sources: [{ symbol: "AUDUSD=X" }, { symbol: "6A=F" }]
+  - label: "JPY"
+    decimals: 2
+    sources: [{ symbol: "USDJPY=X" }, { symbol: "6J=F", invert: true }]
+
+commodities:
+  # These are true futures settlements and reproduce the original issue exactly
+  # (Brent 68.44 / -1.07%, WTI 65.16 / -1.32% to the digit).
+  - label: "XAU"
+    decimals: 2
+    sources: [{ symbol: "GC=F" }, { symbol: "XAUUSD=X" }]
+  - label: "XAG"
+    decimals: 2
+    sources: [{ symbol: "SI=F" }, { symbol: "XAGUSD=X" }]
+  - label: "BRENT"
+    decimals: 2
+    sources: [{ symbol: "BZ=F" }]
+  - label: "WTI"
+    decimals: 2
+    sources: [{ symbol: "CL=F" }]
+
+market:
+  lookback_days: 10          # calendar window pulled to find the last two closes
+  max_staleness_days: 5      # abort if the newest close is older than this
+
+# ---------------------------------------------------------------------------
+# Research (Claude + web search)
+# ---------------------------------------------------------------------------
+research:
+  model: "claude-opus-5"
+  effort: "medium"          # low | medium | high | xhigh | max
+  max_web_searches: 8
+  max_tokens: 16000         # thinking is on by default on Opus 5 — leave headroom
+  retries: 3
+  # How many times to re-ask Claude when the copy busts the word budgets.
+  budget_retries: 2
+
+# Word budgets are what keep the newsletter on exactly one page. They are
+# enforced twice: as instructions in the tool schema Claude fills in, and as a
+# hard validation pass afterwards. Loosen these and the layout will overflow.
+budgets:
+  forex_paragraphs:      { count: 3,     words_each: 40 }
+  international_bullets: { count: 7,     words_each: 26 }
+  local_bullets:         { count: 2,     words_each: 30 }
+  on_this_day_bullets:   { count: 2,     words_each: 22 }
+  quote:                 { max_words: 22 }
+
+# ---------------------------------------------------------------------------
+# Layout — points on a 612 x 792pt page, measured off the original PDF.
+# ---------------------------------------------------------------------------
+layout:
+  page: { width: 612, height: 792 }
+  palette:
+    navy:         "#253745"
+    up_fill:      "#9CD66A"
+    up_arrow:     "#64BB6D"
+    down_fill:    "#E64D44"
+    down_arrow:   "#6D130A"
+    flat_fill:    "#7F7F7F"
+    flat_bar:     "#042433"
+    panel_text:   "#FFFFFF"
+    body:         "#000000"
+  pills:
+    header_y: 110.5
+    first_row_y: 149.5
+    row_pitch: 36.7
+    row_height: 30.0
+    header_height: 30.5
+    radius: 6
+    currency:  { x: 45.5,  width: 126.0 }
+    commodity: { x: 180.5, width: 138.5 }
+  columns:
+    left:  { x: 45.5,  width: 273.5 }
+    right: { x: 338.5, width: 227.5 }
+  type:
+    title: 30.12
+    heading: 17.88
+    quote: 13.20
+    bullet_large: 12.24
+    body: 11.28
+    pill: 11.28
+    pill_unit: 9.36
+    disclaimer: 9.89
+    note: 9.00
+
+# ---------------------------------------------------------------------------
+# Delivery
+# ---------------------------------------------------------------------------
+email:
+  subject: "News in 60 Seconds — {date}"
+  attachment_name: "News in 60 Seconds - {iso_date}.pdf"
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 465
+
+schedule:
+  # Jordan's working week. Python's date.weekday(): Mon=0 ... Sun=6
+  send_weekdays: [6, 0, 1, 2, 3]   # Sun, Mon, Tue, Wed, Thu
+
+archive:
+  enabled: true
+  dir: "archive"
