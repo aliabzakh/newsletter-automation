@@ -120,7 +120,13 @@ budgets:
   international_bullets: { count: 7,     words_each: 26 }
   local_bullets:         { count: 2,     words_each: 30 }
   on_this_day_bullets:   { count: 2,     words_each: 22 }
-  quote:                 { max_words: 22 }
+  # Characters, not words, and counted across the quote AND the author — they
+  # share one line box under the title. Measured: the masthead has room for two
+  # rendered lines (bottom lands at 98.8pt); a third pushes it to 114.9pt, which
+  # collides with the pill table at 110.5pt. Real quotes of 96 characters have
+  # spilled to three lines while others of 98 held at two, since it depends on
+  # where the words break — so the cap sits below the shortest observed failure.
+  quote:                 { max_chars: 85 }
 
 # ---------------------------------------------------------------------------
 # Layout — points on a 612 x 792pt page, measured off the original PDF.

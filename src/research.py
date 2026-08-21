@@ -128,9 +128,13 @@ broke, report the latest published figures and label the reference period.
 explaining what happened and why it mattered. Prefer genuinely significant events \
 — central bank foundings, market crashes, landmark deals, major corporate results.
 
-5. `quote` — one finance or investing quote, at most {quote_words} words, plus its \
-author. Rotate: do not pick the most obvious Buffett line. Quote it accurately; if \
-you are unsure of the exact wording, choose a different quote you are sure of.
+5. `quote` — one finance or investing quote, plus its author. The quote text and \
+the author's name together must come to at most {quote_chars} characters — they \
+share one line under the masthead, and a longer pair wraps into the market table. \
+Short and sharp beats complete: prefer a quotable fragment over a full sentence \
+that only just fits. Rotate: do not pick the most obvious Buffett line. Quote it \
+accurately; if you are unsure of the exact wording, choose a different quote you \
+are sure of.
 {quote_history}
 Word limits are hard. The page is a fixed single page and overlong copy breaks \
 the layout.
@@ -228,10 +232,16 @@ def validate(content: dict[str, Any], budgets: dict[str, Any],
         getter=lambda d: d.get("text", ""),
     )
 
-    qmax = budgets["quote"]["max_words"]
-    qtext = (content.get("quote") or {}).get("text", "")
-    if _words(qtext) > qmax:
-        problems.append(f"quote: {_words(qtext)} words, limit {qmax}.")
+    qmax = budgets["quote"]["max_chars"]
+    quote = content.get("quote") or {}
+    qtext, qauthor = quote.get("text", ""), quote.get("author", "")
+    # The author sits on the same line flow, so it counts against the budget.
+    qlen = len(qtext) + len(qauthor) + 3
+    if qlen > qmax:
+        problems.append(
+            f"quote: {qlen} characters including the author, limit {qmax}. "
+            f"Cut {qlen - qmax} or pick a shorter quote."
+        )
 
     if state is not None and history.is_used(state, qtext):
         problems.append(
@@ -349,7 +359,7 @@ def generate(cfg: dict[str, Any], market: dict[str, Any], today: date,
         local_words=budgets["local_bullets"]["words_each"],
         otd_count=budgets["on_this_day_bullets"]["count"],
         otd_words=budgets["on_this_day_bullets"]["words_each"],
-        quote_words=budgets["quote"]["max_words"],
+        quote_chars=budgets["quote"]["max_chars"],
     )
 
     messages: list[dict[str, Any]] = [{"role": "user", "content": prompt}]

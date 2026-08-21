@@ -30,7 +30,7 @@ Today's edition of News in 60 Seconds is attached.
 
 {headline}
 
-— sent automatically by the News in 60 Seconds pipeline
+— Sent Automatically
 """
 
 

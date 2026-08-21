@@ -38,6 +38,7 @@ FONT_FORMATS = [(".woff2", "woff2"), (".ttf", "truetype")]
 
 MAX_TIGHTEN = 4          # steps the fit check may take before giving up
 BOTTOM_LIMIT_PT = 762.0  # content must clear the disclaimer strip
+PILL_CEILING_PT = 110.5  # masthead must clear the pill headers (layout.pills.header_y)
 
 
 class RenderError(RuntimeError):
@@ -196,6 +197,7 @@ _MEASURE_JS = """
     return (r.top + r.height) * px2pt;
   };
   return { left: box('#col-left'), right: box('#col-right'),
+           masthead: box('#masthead'),
            scroll: document.documentElement.scrollHeight * px2pt };
 }
 """
@@ -224,6 +226,21 @@ def render_pdf(config: dict[str, Any], content: dict[str, Any], market: dict[str
                 page.wait_for_timeout(120)  # let embedded fonts settle before measuring
 
                 m = page.evaluate(_MEASURE_JS)
+
+                # Tightening never moves the masthead, so this is checked once
+                # and fails outright rather than looping. An over-long quote
+                # wraps to a third line and lands on top of the pill headers —
+                # silently, until someone looks at the PDF.
+                if tighten == 0 and m["masthead"] > PILL_CEILING_PT:
+                    q = (content.get("quote") or {})
+                    raise RenderError(
+                        f"the masthead quote overruns into the market table: it "
+                        f"reaches {m['masthead']:.1f}pt against a {PILL_CEILING_PT:.1f}pt "
+                        f"ceiling. The quote plus author is "
+                        f"{len(q.get('text', '')) + len(q.get('author', '')) + 3} "
+                        f"characters; lower budgets.quote.max_chars in config.yaml."
+                    )
+
                 fit = Fit(
                     ok=m["left"] <= BOTTOM_LIMIT_PT and m["right"] <= BOTTOM_LIMIT_PT,
                     tighten=tighten,

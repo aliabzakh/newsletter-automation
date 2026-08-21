@@ -8,5 +8,17 @@
         "author": "Benjamin Graham"
       }
     }
+  ],
+  "retired": [
+    {
+      "text": "The four most dangerous words in investing are: this time it's different.",
+      "author": "Sir John Templeton",
+      "date": "2026-08-21"
+    },
+    {
+      "text": "In the short run, the market is a voting machine but in the long run it is a weighing machine.",
+      "author": "Benjamin Graham",
+      "date": "2026-08-21"
+    }
   ]
 }
