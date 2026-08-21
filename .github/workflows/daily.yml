@@ -84,7 +84,12 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Commit the archived issue
+      - name: Commit the archived issue and the ledger
+        # archive/ holds two things now: the PDF, and history.json — the record
+        # of edition numbers and past quotes. The ledger MUST be committed back.
+        # The runner is rebuilt from scratch every morning, so an uncommitted
+        # ledger means the edition count resets to 1 and retired quotes come
+        # round again the next day.
         if: success()
         run: |
           if [ -z "$(git status --porcelain archive/)" ]; then
