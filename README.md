@@ -2,7 +2,7 @@
 
 A daily financial newsletter that writes and sends itself.
 
-Every weekday morning at 9:30 Amman time, this thing wakes up, pulls live FX and
+Every weekday morning at 8:30 Amman time, this thing wakes up, pulls live FX and
 commodity prices, reads the news, writes a one-page briefing, lays it out as a
 PDF that looks exactly like the original, and emails it out. Nobody touches it.
 
@@ -85,6 +85,34 @@ amount of news varies every single day. Three layers:
    tighter setting and tries again. It only ever shaves leading and gaps — it
    will never silently drop a bullet. If it genuinely can't fit, the run fails
    loudly.
+
+## Filling two sections that don't want to be daily
+
+Both news sections had a failure mode that only shows up once you publish every
+weekday rather than occasionally.
+
+**Local News.** Jordan's hard indicators are published *monthly* — the Central
+Bank's figures, the Department of Statistics releases. Ask for two fresh Jordanian
+data points every morning and roughly four mornings a month have them. The rest of
+the time Claude was reporting the *absence* of news, which is how the August 23
+issue ended up printing "no new Central Bank of Jordan or Department of Statistics
+release was confirmed" as a bullet. Technically true, worthless to read.
+
+So the section is now Jordan-first with an explicit fallback ladder. One bullet is
+always Jordan. The second is either the most recent published Jordanian figure
+*with its reference period stated* — "foreign reserves $26.1bn at end-June" — or,
+failing that, Iraq, the Levant or the Gulf, which is the neighbourhood a treasury
+desk in Amman actually trades. Scope is economic and business news first, with
+government policy that moves business allowed; weather and general politics are
+out. And a house-style rule now forbids reporting that nothing happened, in any
+section.
+
+**International and Regional News.** Left to itself it collapsed onto commodities
+and FX, because those are the numbers already sitting in the table above it — seven
+bullets of oil, gold, silver and the dollar, restating the pills. The prompt now
+names the full field (equity indices, earnings, rates and bond yields, central
+banks, macro data, trade policy, technology) and caps commodities and currencies at
+two of the seven bullets, since the forex section covers that ground already.
 
 ## A thing I found out about yfinance
 
@@ -174,8 +202,8 @@ and that's what the original did.
 
 ## Putting it on autopilot
 
-`.github/workflows/daily.yml` runs it on GitHub Actions at `30 6 * * 0-4`, which
-is 06:30 UTC — 09:30 in Amman. Jordan is UTC+3 all year (they abolished DST in
+`.github/workflows/daily.yml` runs it on GitHub Actions at `30 5 * * 0-4`, which
+is 05:30 UTC — 08:30 in Amman. Jordan is UTC+3 all year (they abolished DST in
 2022), so there's no daylight-saving drift to worry about, which is a nice change
 from every other scheduling problem I've had.
 

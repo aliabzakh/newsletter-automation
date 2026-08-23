@@ -9,7 +9,7 @@ masthead:
   title_number: "60"
   title_suffix: " Seconds"
   timezone: "Asia/Amman"          # Jordan is UTC+3 year-round (DST abolished 2022)
-  recorded_at: "9:30 AM"
+  recorded_at: "8:30 AM"
   logo: "assets/logo.png"
 
   # The number on the first edition this ledger ever records. After that the

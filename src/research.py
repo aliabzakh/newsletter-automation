@@ -79,6 +79,10 @@ beats "oil fell somewhat".
 - No markdown, no bullet characters, no bold, no headings — the layout supplies all \
 of that. Return plain sentences only.
 - Never open a bullet with "Additionally", "Moreover", or "In other news".
+- Every bullet must carry news. Never report the absence of news: no bullet may \
+say that nothing was released, that a figure could not be confirmed, or that no \
+fresh level was available. If you have nothing new, print the most recent \
+verified fact and label the period it refers to.
 - Write in English. Use $ for USD and JD for Jordanian dinar.
 
 Hard rules on numbers:
@@ -111,16 +115,35 @@ week's central-bank and data calendar implies. Reference the pairs in the table 
 by name. Paragraph 1 should lead with the dollar's overall tone.
 
 2. `international` — exactly {intl_count} bullets, at most {intl_words} words each.
-   Global and regional market news: energy, metals, equities, central banks, \
-major bank or institution forecasts, trade policy. One self-contained fact per \
-bullet.
+   Global and regional markets, read broadly: equity indices and index futures, \
+major corporate earnings, guidance and deals, central banks and policy rates, \
+government bond yields, scheduled macro data, trade and tariff policy, \
+technology, energy, metals, and forecasts from major banks or institutions. One \
+self-contained fact per bullet.
+   Spread the bullets across at least four of those areas. At most two may be \
+about commodities or currencies — the price table and the forex section already \
+cover those, and a column of seven oil-and-gold bullets wastes the page. Never \
+write a bullet that merely restates a price printed in the table above.
 
 3. `local` — exactly {local_count} bullets, at most {local_words} words each.
-   Jordan specifically. Search Central Bank of Jordan releases, the Department of \
-Statistics, Jordan News Agency (Petra), and the Amman Stock Exchange. Prefer hard \
-indicators: inflation, GDP, foreign reserves, current account, exports, ASE \
-performance, banking-sector figures, sovereign ratings. If genuinely nothing new \
-broke, report the latest published figures and label the reference period.
+   Jordan first: at least one bullet must be about Jordan every single day. \
+Search Central Bank of Jordan releases, the Department of Statistics, Jordan News \
+Agency (Petra), the Amman Stock Exchange, the Jordan Times and Al-Mamlaka.
+   Economic and business news leads: inflation, GDP, foreign reserves, current \
+account, exports, ASE index performance, banking-sector figures, sovereign \
+ratings, the IMF programme, the budget and public debt, investment, corporate \
+deals, tourism and trade. Government policy that moves business also counts — \
+cabinet decisions, regulation, tax, infrastructure, energy and water projects. \
+Weather and general politics do not.
+   Jordan publishes most hard indicators monthly, so many days bring nothing \
+new. That is expected, and it is not something to report. Fill the second bullet \
+from whichever of these is stronger:
+     (a) the most recently published Jordanian figure, with its reference period \
+stated — "foreign reserves $26.1bn at end-June" is a bullet, "no new CBJ \
+release" is not; or
+     (b) Iraq, the wider Levant or the Gulf — the Central Bank of Iraq, Iraqi \
+oil revenues and budget, regional sovereign issuance, Gulf central-bank or \
+corporate news that a treasury desk in Amman would act on.
 
 4. `on_this_day` — exactly {otd_count} entries.
    Notable events in financial history that happened on {month_day}, any year. \

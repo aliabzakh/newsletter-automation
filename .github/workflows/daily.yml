@@ -2,13 +2,13 @@ name: Daily newsletter
 
 on:
   schedule:
-    # 06:30 UTC = 09:30 in Amman (UTC+3 year-round — Jordan dropped DST in 2022).
+    # 05:30 UTC = 08:30 in Amman (UTC+3 year-round — Jordan dropped DST in 2022).
     # Day field 0-4 is Sunday through Thursday: Jordan's working week.
     #
     # GitHub's scheduler is best-effort and can lag by several minutes under
     # load. If the exact minute ever matters, move the send behind your own
     # scheduler — this is a briefing, so a few minutes' drift is fine.
-    - cron: "30 6 * * 0-4"
+    - cron: "30 5 * * 0-4"
 
   workflow_dispatch:
     inputs:
