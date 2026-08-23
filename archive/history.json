@@ -7,6 +7,14 @@
         "text": "In the short run, the market is a voting machine but in the long run it is a weighing machine.",
         "author": "Benjamin Graham"
       }
+    },
+    {
+      "date": "2026-08-23",
+      "edition": 2,
+      "quote": {
+        "text": "Know what you own, and know why you own it.",
+        "author": "Peter Lynch"
+      }
     }
   ],
   "retired": [
@@ -19,6 +27,11 @@
       "text": "In the short run, the market is a voting machine but in the long run it is a weighing machine.",
       "author": "Benjamin Graham",
       "date": "2026-08-21"
+    },
+    {
+      "text": "Know what you own, and know why you own it.",
+      "author": "Peter Lynch",
+      "date": "2026-08-23"
     }
   ]
 }
