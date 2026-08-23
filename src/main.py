@@ -80,7 +80,12 @@ def run(config: dict, today: date, send: bool) -> int:
         log.info("[3/4] rendering the page")
         render.render_pdf(config, content, prices, date_long, pdf_path, edition)
 
-        if config.get("archive", {}).get("enabled"):
+        # Same rule as the ledger below: a dry run is a rehearsal, so it must
+        # not touch the archive either. CI commits archive/ back to the repo,
+        # which means an unguarded rehearsal replaces the stored copy of an
+        # issue that already went out — different copy, same filename, and the
+        # real one is gone. The build still lands in out/ for inspection.
+        if send and config.get("archive", {}).get("enabled"):
             archive_dir = ROOT / config["archive"]["dir"]
             archive_dir.mkdir(parents=True, exist_ok=True)
             (archive_dir / f"{iso}.pdf").write_bytes(pdf_path.read_bytes())
@@ -88,7 +93,7 @@ def run(config: dict, today: date, send: bool) -> int:
 
         stage = "send"
         if not send:
-            log.info("[4/4] dry run — not sending. PDF at %s", pdf_path)
+            log.info("[4/4] dry run — not sending or archiving. PDF at %s", pdf_path)
             return 0
 
         log.info("[4/4] sending")
