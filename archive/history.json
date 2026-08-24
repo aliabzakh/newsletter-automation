@@ -15,6 +15,14 @@
         "text": "Know what you own, and know why you own it.",
         "author": "Peter Lynch"
       }
+    },
+    {
+      "date": "2026-08-24",
+      "edition": 3,
+      "quote": {
+        "text": "Be right and sit tight.",
+        "author": "Jesse Livermore"
+      }
     }
   ],
   "retired": [
@@ -32,6 +40,11 @@
       "text": "Know what you own, and know why you own it.",
       "author": "Peter Lynch",
       "date": "2026-08-23"
+    },
+    {
+      "text": "Be right and sit tight.",
+      "author": "Jesse Livermore",
+      "date": "2026-08-24"
     }
   ]
 }
