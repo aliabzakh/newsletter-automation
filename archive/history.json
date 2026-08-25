@@ -23,6 +23,14 @@
         "text": "Be right and sit tight.",
         "author": "Jesse Livermore"
       }
+    },
+    {
+      "date": "2026-08-25",
+      "edition": 4,
+      "quote": {
+        "text": "You can't predict. You can prepare.",
+        "author": "Howard Marks"
+      }
     }
   ],
   "retired": [
@@ -45,6 +53,11 @@
       "text": "Be right and sit tight.",
       "author": "Jesse Livermore",
       "date": "2026-08-24"
+    },
+    {
+      "text": "You can't predict. You can prepare.",
+      "author": "Howard Marks",
+      "date": "2026-08-25"
     }
   ]
 }
