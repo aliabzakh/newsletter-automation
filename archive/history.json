@@ -39,6 +39,14 @@
         "text": "Don't look for the needle in the haystack. Just buy the haystack.",
         "author": "John Bogle"
       }
+    },
+    {
+      "date": "2026-08-27",
+      "edition": 6,
+      "quote": {
+        "text": "He who lives by the crystal ball will eat shattered glass.",
+        "author": "Ray Dalio"
+      }
     }
   ],
   "retired": [
@@ -71,6 +79,11 @@
       "text": "Don't look for the needle in the haystack. Just buy the haystack.",
       "author": "John Bogle",
       "date": "2026-08-26"
+    },
+    {
+      "text": "He who lives by the crystal ball will eat shattered glass.",
+      "author": "Ray Dalio",
+      "date": "2026-08-27"
     }
   ]
 }
