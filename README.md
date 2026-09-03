@@ -22,13 +22,6 @@ mailer.py     →  Gmail SMTP, PDF attached
 If any step can't do its job properly, the whole run stops and emails a
 traceback instead. 
 
-| | |
-|---|---|
-| Navy | `#253745` |
-| Up | `#9CD66A` fill, `#64BB6D` arrow |
-| Down | `#E64D44` fill, `#6D130A` arrow |
-| Flat | `#7F7F7F` fill, `#042433` bars |
-
 ## Keeping it on one page
 
 1. **Word budgets in the prompt.** Every section has a hard limit
@@ -48,7 +41,7 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-**See it render** without spending a cent on API calls or emailing anyone:
+**See it render** 
 
 ```bash
 python scripts/preview.py
